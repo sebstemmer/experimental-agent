@@ -3,7 +3,7 @@ from datetime import date
 
 from sqlmodel import col, select, update
 from sqlmodel.ext.asyncio.session import AsyncSession
-from todo.models import RecurrenceFrequency, Todo
+from postgres_mcp.todo.models import RecurrenceFrequency, Todo
 
 
 async def create_todo(

@@ -1,14 +1,15 @@
 from datetime import date
 from typing import Annotated
 
-from database import get_database_session
 from dateutil.relativedelta import relativedelta
 from fastmcp.exceptions import ToolError
-from mcp_app import mcp
 from pydantic import Field as PydanticField
-from todo.models import RecurrenceFrequency, Todo
-from todo.repository import complete_todo as complete_todo_in_db
-from todo.repository import create_todo, read_all_open_todos
+
+from postgres_mcp.database import get_database_session
+from postgres_mcp.mcp_app import mcp
+from postgres_mcp.todo.models import RecurrenceFrequency, Todo
+from postgres_mcp.todo.repository import complete_todo as complete_todo_in_db
+from postgres_mcp.todo.repository import create_todo, read_all_open_todos
 
 
 def format_todo(todo: Todo) -> str:

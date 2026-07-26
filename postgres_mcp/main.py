@@ -1,6 +1,6 @@
-import todo.tools  # noqa: F401 -- import triggers @mcp.tool registration
+import postgres_mcp.todo.tools  # noqa: F401 -- import triggers @mcp.tool registration
 from dotenv import load_dotenv
-from mcp_app import mcp
+from postgres_mcp.mcp_app import mcp
 
 load_dotenv()
 

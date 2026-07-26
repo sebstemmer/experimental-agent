@@ -7,7 +7,15 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 load_dotenv()
 
-engine = create_async_engine(os.getenv("DATABASE_URL"))
+
+def require_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise RuntimeError(f"{name} is not set")
+    return value
+
+
+engine = create_async_engine(require_env("DATABASE_URL"))
 
 
 def get_database_session() -> AsyncSession:

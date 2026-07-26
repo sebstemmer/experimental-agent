@@ -33,7 +33,7 @@ def require_env(name: str) -> str:
 token = require_env("BOT_TOKEN")
 agent_folder = require_env("AGENT_FOLDER")
 postgres_mcp_python = require_env("POSTGRES_MCP_PYTHON")
-postgres_mcp_script = require_env("POSTGRES_MCP_SCRIPT")
+project_root = require_env("PROJECT_ROOT")
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -112,14 +112,20 @@ client = MultiServerMCPClient(
         "postgres": {
             "transport": "stdio",
             "command": postgres_mcp_python,
-            "args": [postgres_mcp_script],
+            "args": ["-m", "postgres_mcp.main"],
+            "cwd": project_root,
         },
     }
 )
 
 postgres_mcp_session = client.session("postgres")
 
-BASE_SYSTEM_PROMPT = "You are a helpful assistant."
+BASE_SYSTEM_PROMPT = (
+    "You are a helpful assistant. "
+    "Reply in plain text only. Do not use any Markdown formatting "
+    "(no **bold**, no *italic*, no backticks, no headings or bullet markup) — "
+    "the chat client shows it as literal characters."
+)
 
 
 @dynamic_prompt

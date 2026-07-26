@@ -109,6 +109,3 @@ dependencies = [
     "zipp==4.1.0",
     "zstandard==0.25.0",
 ]
-
-[tool.pyright]
-extraPaths = ["postgres_mcp"]

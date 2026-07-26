@@ -1,4 +1,4 @@
-from database import create_all_tables_on_start
+from postgres_mcp.database import create_all_tables_on_start
 from fastmcp import FastMCP
 from fastmcp.server.lifespan import lifespan
 
