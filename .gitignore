@@ -1,0 +1,7 @@
+data
+.venv
+.claude/settings.local.json
+.env
+__pycache__
+agent_folder
+.DS_Store
