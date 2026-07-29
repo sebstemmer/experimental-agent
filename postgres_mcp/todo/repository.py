@@ -3,6 +3,7 @@ from datetime import date
 
 from sqlmodel import col, select, update
 from sqlmodel.ext.asyncio.session import AsyncSession
+
 from postgres_mcp.todo.models import RecurrenceFrequency, Todo
 
 
@@ -26,9 +27,7 @@ async def create_todo(
 
 async def read_all_open_todos(session: AsyncSession) -> Sequence[Todo]:
     result = await session.exec(
-        select(Todo)
-        .where(col(Todo.done).is_(False))
-        .order_by(col(Todo.due_date).asc())
+        select(Todo).where(col(Todo.done).is_(False)).order_by(col(Todo.due_date).asc())
     )
     return result.all()
 
