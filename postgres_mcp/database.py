@@ -1,19 +1,11 @@
-import os
-
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from utils.require_env import require_env
+
 load_dotenv()
-
-
-def require_env(name: str) -> str:
-    value = os.getenv(name)
-    if not value:
-        raise RuntimeError(f"{name} is not set")
-    return value
-
 
 engine = create_async_engine(require_env("DATABASE_URL"))
 

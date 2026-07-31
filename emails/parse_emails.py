@@ -15,11 +15,8 @@ from emails.repository import (
     create_processed_email,
     read_unprocessed_emails,
 )
-from postgres_mcp.database import (
-    create_all_tables_on_start,
-    get_database_session,
-    require_env,
-)
+from postgres_mcp.database import create_all_tables_on_start, get_database_session
+from utils.require_env import require_env
 
 folder = Path("data/emails")
 
@@ -28,6 +25,12 @@ WHITELIST = [
 ]
 
 SUMMARY_PROMPT = (
+    "The following text was extracted from an HTML email by stripping all tags, "
+    "so it may contain layout artifacts typical of that process: repeated "
+    "navigation or menu items, alt text, social media links, 'view in browser' "
+    "notices, and duplicated headers or footers from the original table-based "
+    "layout. Treat all of this as noise, even where it isn't explicitly listed "
+    "below. "
     "Condense the email into its essential information. "
     "The summary will be used to answer questions later about what happened - "
     "keep only what is needed for that. "
