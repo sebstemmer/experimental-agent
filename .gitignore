@@ -2,6 +2,7 @@ data
 .venv
 .claude/settings.local.json
 .env
+deploy/k8s/postgres-credentials.yaml
 __pycache__
 agent_folder
 .DS_Store
