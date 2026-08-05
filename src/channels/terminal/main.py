@@ -12,7 +12,7 @@ async def main() -> None:
     client = build_mcp_client()
 
     async with client.session("postgres") as session:
-        agent = await build_agent(session)
+        agent = await build_agent(session, allowed_tools=None)
 
         thread_id = "terminal"
         pending = 0

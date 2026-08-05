@@ -1,3 +1,4 @@
+from collections.abc import Collection
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -17,11 +18,12 @@ BASE_SYSTEM_PROMPT = (
     "the chat client shows it as literal characters."
 )
 
+
 def make_prompt_with_time(system_prompt: str):
     @dynamic_prompt
     def prompt_with_time(request: ModelRequest) -> str:
         now = datetime.now(ZoneInfo("Europe/Berlin"))
-        return f"{system_prompt}\n\\Current date/time: {now.isoformat()}"
+        return f"{system_prompt}\n\nCurrent date/time: {now.isoformat()}"
 
     return prompt_with_time
 
@@ -50,8 +52,19 @@ def build_mcp_client() -> MultiServerMCPClient:
     )
 
 
-async def build_agent(postgres_session, system_prompt: str = BASE_SYSTEM_PROMPT):
+async def build_agent(
+    postgres_session,
+    # None means every tool the MCP server offers
+    allowed_tools: Collection[str] | None,
+    system_prompt: str = BASE_SYSTEM_PROMPT,
+):
     tools = await load_mcp_tools(postgres_session)
+
+    if allowed_tools is not None:
+        if unknown := set(allowed_tools) - {tool.name for tool in tools}:
+            raise RuntimeError(f"unknown tools: {', '.join(sorted(unknown))}")
+        tools = [tool for tool in tools if tool.name in allowed_tools]
+
     return create_agent(
         model="openai:gpt-5.5",
         tools=tools,

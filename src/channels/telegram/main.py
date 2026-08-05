@@ -28,6 +28,8 @@ PRIVACY_SYSTEM_PROMPT = (
     "explain that you do not repeat such data in this chat."
 )
 
+ALLOWED_TOOLS = ("add_todo", "get_all_open_todos", "complete_todo")
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
@@ -58,7 +60,9 @@ async def handle_telegram_message(update: Update, context: ContextTypes.DEFAULT_
     thread_id = str(update.effective_chat.id)
     pending = context.chat_data.get("pending_decisions", 0)
 
-    reply, pending = await handle_message(agent, thread_id, update.message.text, pending)
+    reply, pending = await handle_message(
+        agent, thread_id, update.message.text, pending
+    )
     context.chat_data["pending_decisions"] = pending
 
     await update.message.reply_text(reply)
@@ -67,7 +71,9 @@ async def handle_telegram_message(update: Update, context: ContextTypes.DEFAULT_
 async def post_init(application):
     session = await postgres_mcp_session.__aenter__()
     application.bot_data["agent"] = await build_agent(
-        session, f"{BASE_SYSTEM_PROMPT} {PRIVACY_SYSTEM_PROMPT}"
+        session,
+        allowed_tools=ALLOWED_TOOLS,
+        system_prompt=f"{BASE_SYSTEM_PROMPT} {PRIVACY_SYSTEM_PROMPT}",
     )
     print("Bot started!")
 

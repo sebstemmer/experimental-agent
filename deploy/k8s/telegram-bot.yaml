@@ -14,9 +14,11 @@ spec:
       labels:
         app: telegram-bot
     spec:
+      imagePullSecrets:
+        - name: ghcr
       containers:
         - name: telegram-bot
-          image: experimental-agent-bot
+          image: ghcr.io/sebstemmer/experimental-agent:latest
           imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef:
