@@ -3,6 +3,6 @@ data
 .claude/settings.local.json
 .env
 deploy/k8s/postgres-credentials.yaml
+deploy/k8s/telegram-bot-credentials.yaml
 __pycache__
-agent_folder
 .DS_Store

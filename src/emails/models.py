@@ -6,7 +6,7 @@ from sqlmodel import Field, SQLModel
 
 
 class Email(SQLModel, table=True):
-    __tablename__ = "emails"
+    __tablename__ = "emails"  # type: ignore
     id: int | None = Field(default=None, primary_key=True)
     message_id: str = Field(index=True, unique=True)
     sender: str
@@ -19,7 +19,7 @@ class Email(SQLModel, table=True):
 
 
 class ProcessedEmail(SQLModel, table=True):
-    __tablename__ = "processed_emails"
+    __tablename__ = "processed_emails"  # type: ignore
     email_id: int = Field(foreign_key="emails.id", primary_key=True)
     summary: str
     summary_embedding: list[float] = Field(

@@ -31,26 +31,20 @@ def describe_complete_todo(tool_call, state, runtime) -> str:
 
 
 def build_mcp_client() -> MultiServerMCPClient:
-    agent_folder = require_env("AGENT_FOLDER")
     postgres_mcp_python = require_env("POSTGRES_MCP_PYTHON")
     project_root = require_env("PROJECT_ROOT")
 
     return MultiServerMCPClient(
         {
-            "filesystem": {
-                "transport": "stdio",
-                "command": "npx",
-                "args": [
-                    "-y",
-                    "@modelcontextprotocol/server-filesystem",
-                    agent_folder,
-                ],
-            },
             "postgres": {
                 "transport": "stdio",
                 "command": postgres_mcp_python,
                 "args": ["-m", "postgres_mcp.main"],
                 "cwd": project_root,
+                "env": {
+                    "DATABASE_URL": require_env("DATABASE_URL"),
+                    "OPENAI_API_KEY": require_env("OPENAI_API_KEY"),
+                },
             },
         }
     )

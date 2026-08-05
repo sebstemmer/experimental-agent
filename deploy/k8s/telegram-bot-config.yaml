@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegram-bot-config
+data:
+  POSTGRES_MCP_PYTHON: /app/.venv/bin/python
+  PROJECT_ROOT: /app
+  LANGSMITH_TRACING: "true"
+  LANGSMITH_ENDPOINT: https://eu.api.smith.langchain.com
+  LANGSMITH_PROJECT: exp-agent
