@@ -16,7 +16,7 @@ kubectl config use-context "k3d-$CLUSTER"
 docker build -t "$IMAGE" .
 k3d image import "$IMAGE" -c "$CLUSTER"
 
-kubectl apply -f deploy/k8s/
+kubectl apply -f deploy/k8s/ -f deploy/k8s/local-secrets/
 
 kubectl rollout restart deployment/telegram-bot
 kubectl rollout status deployment/telegram-bot --timeout=180s

@@ -57,9 +57,10 @@ jobs:
             echo ---
             sed "s|${{ env.IMAGE }}:latest|${{ env.IMAGE }}:${{ github.sha }}|" \
               deploy/k8s/telegram-bot.yaml
-          } | ssh deploy@${{ secrets.SERVER_IP }} "kubectl apply -f -"
+          } | ssh deploy@${{ secrets.SERVER_IP }} \
+                "KUBECONFIG=~/.kube/config kubectl apply -f -"
 
       - name: Wait for rollout
         run: |
           ssh deploy@${{ secrets.SERVER_IP }} \
-            "kubectl rollout status deployment/telegram-bot --timeout=180s"
+            "KUBECONFIG=~/.kube/config kubectl rollout status deployment/telegram-bot --timeout=180s"

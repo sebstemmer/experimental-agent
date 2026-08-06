@@ -2,7 +2,9 @@ data
 .venv
 .claude/settings.local.json
 .env
-deploy/k8s/postgres-credentials.yaml
-deploy/k8s/telegram-bot-credentials.yaml
+deploy/k8s/local-secrets/
+deploy/k8s/prod-secrets/
+deploy/ansible/inventory.yml
+deploy/ansible/github.pub
 __pycache__
 .DS_Store
