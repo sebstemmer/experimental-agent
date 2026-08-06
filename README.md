@@ -5,25 +5,57 @@
 There are two targets, each with its own secrets: a local [k3d](https://k3d.io/) cluster and a
 [k3s](https://k3s.io/) server.
 
-Locally `deploy/local.sh` applies everything in one go. On the server the work is split — Ansible
-provisions Postgres and the secrets once, GitHub Actions applies the bot manifests on every push.
+Locally `deploy/telegram.sh` and `deploy/terminal.sh` apply everything in one go. On the server the
+work is split — Ansible provisions Postgres and the secrets once, GitHub Actions applies the bot
+manifests on every push.
 
 ### Local
 
-**1. Create the secrets**
+Two separate programs, each with its own setup. Both scripts bring up the k3d cluster and Postgres
+first, so you can run either one without the other.
+
+**Shared: the database secret**
 
 ```bash
 mkdir -p deploy/k8s/local-secrets
 cp deploy/k8s/postgres-credentials.yaml.example deploy/k8s/local-secrets/postgres-credentials.yaml
+```
+
+Fill in a password, for example from `openssl rand -base64 24`.
+
+#### Terminal
+
+Runs as a process on your machine, so it reads its configuration from `.env` rather than from the
+cluster:
+
+```bash
+cp .env.example .env
+```
+
+`DATABASE_URL` points at the cluster from outside, so use `localhost:30432` with the user and
+database from `deploy/k8s/postgres-config.yaml` and the password you just set. `POSTGRES_MCP_PYTHON`
+and `PROJECT_ROOT` point into this repo. `BOT_TOKEN` stays empty, it is not used here.
+
+```bash
+./deploy/terminal.sh
+```
+
+#### Telegram
+
+Needs its own bot. Talk to [@BotFather](https://t.me/BotFather): send `/newbot`, pick a display name
+and a username ending in `bot`, and he replies with the token. Register a second bot for the server
+— Telegram only allows one poller per token, so sharing one would make the two instances steal each
+other's messages.
+
+```bash
 cp deploy/k8s/telegram-bot-credentials.yaml.example deploy/k8s/local-secrets/telegram-bot-credentials.yaml
 ```
 
-Fill both in. Generate the Postgres password with `openssl rand -base64 24`.
-
-**2. Deploy**
+Fill in `BOT_TOKEN` and `OPENAI_API_KEY`, then build the image and roll the bot out into the
+cluster, where it keeps running:
 
 ```bash
-./deploy/local.sh
+./deploy/telegram.sh
 ```
 
 ### Server

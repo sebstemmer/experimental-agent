@@ -47,6 +47,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def chatid(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not update.effective_chat:
+        return
+
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, text=str(update.effective_chat.id)
+    )
+
+
 async def handle_telegram_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if (
         not update.message
@@ -98,5 +107,8 @@ if __name__ == "__main__":
 
     start_handler = CommandHandler("start", start)
     application.add_handler(start_handler)
+
+    chatid_handler = CommandHandler("chatid", chatid)
+    application.add_handler(chatid_handler)
 
     application.run_polling()
