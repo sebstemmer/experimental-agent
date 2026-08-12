@@ -12,6 +12,7 @@ from telegram.ext import (
 
 from channels.agent_setup import BASE_SYSTEM_PROMPT, build_agent, build_mcp_client
 from channels.handle_message import handle_message
+from morning_briefing.job import register as register_morning_briefing
 from utils.require_env import require_env
 
 load_dotenv()
@@ -84,6 +85,9 @@ async def post_init(application):
         allowed_tools=ALLOWED_TOOLS,
         system_prompt=f"{BASE_SYSTEM_PROMPT} {PRIVACY_SYSTEM_PROMPT}",
     )
+
+    register_morning_briefing(application.job_queue)
+
     print("Bot started!")
 
 
