@@ -7,7 +7,7 @@ from telegram.ext import ContextTypes, JobQueue
 
 from channels.handle_message import handle_message
 
-BRIEFING_TIME = time(14, 35, tzinfo=ZoneInfo("Europe/Berlin"))
+BRIEFING_TIME = time(7, 0, tzinfo=ZoneInfo("Europe/Berlin"))
 BRIEFING_PROMPT = (
     "Start with a short greeting like 'Good morning Sebastian', "
     "then list my open todos."
