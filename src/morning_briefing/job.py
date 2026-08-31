@@ -9,8 +9,10 @@ from channels.handle_message import handle_message
 
 BRIEFING_TIME = time(7, 0, tzinfo=ZoneInfo("Europe/Berlin"))
 BRIEFING_PROMPT = (
-    "Start with a short greeting like 'Good morning Sebastian', "
-    "then list my open todos."
+    "Start with a short greeting like 'Good morning Sebastian', then list my "
+    "todos in three groups, each todo appearing exactly once: overdue ones "
+    "first, then those due within the next 7 days, then the remaining open "
+    "ones including those without a due date."
 )
 
 logger = logging.getLogger(__name__)
