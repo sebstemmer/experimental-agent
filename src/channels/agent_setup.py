@@ -7,6 +7,7 @@ from langchain.agents.middleware import HumanInTheLoopMiddleware, dynamic_prompt
 from langchain.agents.middleware.types import ModelRequest
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
+from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import InMemorySaver
 
 from utils.require_env import require_env
@@ -74,7 +75,7 @@ async def build_agent(
         tools = [tool for tool in tools if tool.name in allowed_tools]
 
     return create_agent(
-        model="openai:gpt-5.6-luna",
+        model=ChatOpenAI(model="gpt-5.6-luna", use_responses_api=True),
         tools=tools,
         checkpointer=InMemorySaver(),
         middleware=[
