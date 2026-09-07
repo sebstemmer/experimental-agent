@@ -29,4 +29,4 @@ async def handle_message(
         question = "\n".join(action["description"] for action in action_requests)
         return f"{question}\n\n(yes/no)", len(action_requests)
 
-    return result["messages"][-1].content, 0
+    return result["messages"][-1].text, 0
