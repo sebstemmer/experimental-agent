@@ -17,7 +17,8 @@ BRIEFING_PROMPT = (
     "<todos due in the next 7 days, except those already under Today>\n\n"
     "Overdue:\n"
     "<todos whose due date is in the past>\n\n"
-    "Start every todo with the id the tool returned, so I can refer to it. "
+    "Copy each todo exactly as the tool returned it, unchanged - id, title, "
+    "due date and recurrence. Do not shorten or reword them. "
     "Todos matching none of these are simply left out. "
     "Omit a section completely when it has no todos."
 )
