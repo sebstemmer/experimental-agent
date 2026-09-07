@@ -10,6 +10,8 @@ from postgres_mcp.mcp_app import mcp
 from postgres_mcp.todo.models import RecurrenceFrequency, Todo
 from postgres_mcp.todo.repository import complete_todo as complete_todo_in_db
 from postgres_mcp.todo.repository import create_todo, read_all_open_todos
+from postgres_mcp.todo.repository import delete_todo as delete_todo_in_db
+from postgres_mcp.todo.repository import update_todo as update_todo_in_db
 
 
 def format_todo(todo: Todo) -> str:
@@ -129,4 +131,54 @@ async def complete_todo(
     result = f"Completed todo {format_todo(todo)}"
     if next_todo is not None:
         result += f". Next one due {next_todo.due_date}"
+    return result
+
+
+@mcp.tool
+async def update_todo(
+    id: Annotated[int, PydanticField(description="The ID of the todo to update")],
+    title: Annotated[
+        str | None,
+        PydanticField(description="The new title. Omit to leave the title unchanged."),
+    ] = None,
+    due_date: Annotated[
+        str | None,
+        PydanticField(
+            description="The new due date in YYYY-MM-DD format. Omit to leave the due date unchanged. For a recurring todo this also becomes the base date for the next occurrence."
+        ),
+    ] = None,
+) -> str:
+    """Update the title or due date of a todo."""
+    if title is None and due_date is None:
+        raise ToolError("Nothing to update. Please provide a title or a due_date.")
+
+    parsed_due_date = None
+    if due_date:
+        try:
+            parsed_due_date = date.fromisoformat(due_date)
+        except ValueError:
+            raise ToolError("Invalid due date format. Please use YYYY-MM-DD.")
+
+    async with get_database_session() as session, session.begin():
+        todo = await update_todo_in_db(session, id, title, parsed_due_date)
+        if todo is None:
+            return f"No open todo found with ID {id}."
+
+        result = f"Updated todo {format_todo(todo)}"
+
+    return result
+
+
+@mcp.tool
+async def delete_todo(
+    id: Annotated[int, PydanticField(description="The ID of the todo to delete")],
+) -> str:
+    """Delete a todo permanently."""
+    async with get_database_session() as session, session.begin():
+        todo = await delete_todo_in_db(session, id)
+        if todo is None:
+            return f"No open todo found with ID {id}."
+
+        result = f"Deleted todo {format_todo(todo)}"
+
     return result

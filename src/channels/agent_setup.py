@@ -32,6 +32,14 @@ def describe_complete_todo(tool_call, state, runtime) -> str:
     return f"Complete todo {tool_call['args'].get('id')}?"
 
 
+def describe_update_todo(tool_call, state, runtime) -> str:
+    return f"Update todo {tool_call['args'].get('id')}?"
+
+
+def describe_delete_todo(tool_call, state, runtime) -> str:
+    return f"Delete todo {tool_call['args'].get('id')}?"
+
+
 def build_mcp_client() -> MultiServerMCPClient:
     postgres_mcp_python = require_env("POSTGRES_MCP_PYTHON")
     project_root = require_env("PROJECT_ROOT")
@@ -66,7 +74,7 @@ async def build_agent(
         tools = [tool for tool in tools if tool.name in allowed_tools]
 
     return create_agent(
-        model="openai:gpt-5.5",
+        model="openai:gpt-5.6-luna",
         tools=tools,
         checkpointer=InMemorySaver(),
         middleware=[
@@ -76,7 +84,15 @@ async def build_agent(
                     "complete_todo": {
                         "allowed_decisions": ["approve", "reject"],
                         "description": describe_complete_todo,
-                    }
+                    },
+                    "update_todo": {
+                        "allowed_decisions": ["approve", "reject"],
+                        "description": describe_update_todo,
+                    },
+                    "delete_todo": {
+                        "allowed_decisions": ["approve", "reject"],
+                        "description": describe_delete_todo,
+                    },
                 }
             ),
         ],

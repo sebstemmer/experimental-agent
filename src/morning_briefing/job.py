@@ -9,12 +9,17 @@ from channels.handle_message import handle_message
 
 BRIEFING_TIME = time(7, 0, tzinfo=ZoneInfo("Europe/Berlin"))
 BRIEFING_PROMPT = (
-    "Start with a short greeting like 'Good morning Sebastian', then list my "
-    "todos in three groups, each todo appearing exactly once. "
-    "First: todos due today, together with all todos that have no due date. "
-    "Second: todos due within the next 7 days, excluding the ones already "
-    "listed in the first group. "
-    "Third: overdue todos, excluding the ones without a due date."
+    "Send my morning briefing. Use exactly this format and nothing else:\n\n"
+    "Good morning Sebastian\n\n"
+    "Today:\n"
+    "<todos due today, plus every todo without a due date>\n\n"
+    "Next 7 days:\n"
+    "<todos due in the next 7 days, except those already under Today>\n\n"
+    "Overdue:\n"
+    "<todos whose due date is in the past>\n\n"
+    "Start every todo with the id the tool returned, so I can refer to it. "
+    "Todos matching none of these are simply left out. "
+    "Omit a section completely when it has no todos."
 )
 
 logger = logging.getLogger(__name__)

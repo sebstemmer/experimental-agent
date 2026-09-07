@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from datetime import date
 
-from sqlmodel import col, select, update
+from sqlmodel import col, delete, select, update
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from postgres_mcp.todo.models import RecurrenceFrequency, Todo
@@ -37,6 +37,33 @@ async def complete_todo(session: AsyncSession, id: int) -> Todo | None:
         update(Todo)
         .where(col(Todo.id) == id, col(Todo.done).is_(False))
         .values(done=True)
+        .returning(Todo)
+    )
+    return result.scalars().first()
+
+
+async def update_todo(
+    session: AsyncSession, id: int, title: str | None, due_date: date | None
+) -> Todo | None:
+    values = {}
+    if title is not None:
+        values["title"] = title
+    if due_date is not None:
+        values["due_date"] = due_date
+
+    result = await session.exec(
+        update(Todo)
+        .where(col(Todo.id) == id, col(Todo.done).is_(False))
+        .values(**values)
+        .returning(Todo)
+    )
+    return result.scalars().first()
+
+
+async def delete_todo(session: AsyncSession, id: int) -> Todo | None:
+    result = await session.exec(
+        delete(Todo)
+        .where(col(Todo.id) == id, col(Todo.done).is_(False))
         .returning(Todo)
     )
     return result.scalars().first()

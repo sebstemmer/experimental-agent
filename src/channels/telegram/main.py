@@ -30,7 +30,13 @@ PRIVACY_SYSTEM_PROMPT = (
     "explain that you do not repeat such data in this chat."
 )
 
-ALLOWED_TOOLS = ("add_todo", "get_all_open_todos", "complete_todo")
+ALLOWED_TOOLS = (
+    "add_todo",
+    "get_all_open_todos",
+    "complete_todo",
+    "update_todo",
+    "delete_todo",
+)
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
