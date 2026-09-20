@@ -30,7 +30,11 @@ def make_prompt_with_time(system_prompt: str):
 
 
 def describe_complete_todo(tool_call, state, runtime) -> str:
-    return f"Complete todo {tool_call['args'].get('id')}?"
+    args = tool_call["args"]
+    text = f"Complete todo {args.get('id')}"
+    if args.get("next_due"):
+        text += f", next one due {args['next_due']}"
+    return f"{text}?"
 
 
 def describe_update_todo(tool_call, state, runtime) -> str:

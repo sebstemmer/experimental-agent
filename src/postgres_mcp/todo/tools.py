@@ -1,5 +1,6 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Annotated
+from zoneinfo import ZoneInfo
 
 from dateutil.relativedelta import relativedelta
 from fastmcp.exceptions import ToolError
@@ -90,20 +91,31 @@ async def get_all_open_todos() -> str:
 @mcp.tool
 async def complete_todo(
     id: Annotated[int, PydanticField(description="The ID of the todo to complete")],
-    next_start: Annotated[
+    next_due: Annotated[
         str | None,
         PydanticField(
-            description="For recurring todos: base date (YYYY-MM-DD) for the next occurrence. Defaults to the completed todo's due date. Pass today's date to reschedule the next occurrence from now."
+            description=(
+                "For recurring todos: the due date (YYYY-MM-DD) of the next occurrence. "
+                "Pass it whenever the user says when the next one is due; give the resulting date, not a base date. "
+                "Example 1 (weekly todo, today 2026-09-20): 'next due in 6 days' -> count 6 days forward from today -> next_due='2026-09-26'. "
+                "Example 2 (weekly todo, today 2026-09-20): 'I did it yesterday' -> the next one is due one recurrence after yesterday -> 2026-09-19 + 1 week -> next_due='2026-09-26'. "
+                "Must not be in the past."
+            )
         ),
     ] = None,
 ) -> str:
-    """Complete a todo."""
-    parsed_next_start = None
-    if next_start:
+    """Complete a todo. For a recurring todo this also creates the next occurrence,
+    due one recurrence after the completed todo's due date unless next_due is given."""
+    parsed_next_due = None
+    if next_due:
         try:
-            parsed_next_start = date.fromisoformat(next_start)
+            parsed_next_due = date.fromisoformat(next_due)
         except ValueError:
-            raise ToolError("Invalid next_start format. Please use YYYY-MM-DD.")
+            raise ToolError("Invalid next_due format. Please use YYYY-MM-DD.")
+        if parsed_next_due < datetime.now(ZoneInfo("Europe/Berlin")).date():
+            raise ToolError(
+                f"next_due {parsed_next_due} is in the past. Please pass today or a future date."
+            )
 
     async with get_database_session() as session, session.begin():
         todo = await complete_todo_in_db(session, id)
@@ -114,16 +126,18 @@ async def complete_todo(
         if todo.recurrence_frequency:
             freq = RecurrenceFrequency(todo.recurrence_frequency)
             interval = todo.recurrence_interval or 1
-            anchor = parsed_next_start or todo.due_date
-            if anchor is None:
+            if parsed_next_due is not None:
+                next_due_date = parsed_next_due
+            elif todo.due_date is not None:
+                next_due_date = todo.due_date + relativedelta(**{f"{freq.name}s": interval})  # type: ignore[arg-type]
+            else:
                 raise ToolError(
-                    "Recurring todo has no due date to compute the next occurrence."
+                    "Recurring todo has no due date to compute the next occurrence. Please pass next_due."
                 )
-            next_due = anchor + relativedelta(**{f"{freq.name}s": interval})  # type: ignore[arg-type]
             next_todo = await create_todo(
                 session,
                 todo.title,
-                next_due,
+                next_due_date,
                 todo.recurrence_frequency,
                 todo.recurrence_interval,
             )

@@ -12,7 +12,7 @@ from telegram.ext import (
 
 from channels.agent_setup import BASE_SYSTEM_PROMPT, build_agent, build_mcp_client
 from channels.handle_message import handle_message
-from morning_briefing.job import BRIEFING_PROMPT
+from morning_briefing.job import build_briefing_prompt
 from morning_briefing.job import register as register_morning_briefing
 from utils.require_env import require_env
 
@@ -71,7 +71,7 @@ async def briefing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     agent = context.bot_data["agent"]
     thread_id = str(update.effective_chat.id)
 
-    reply, _ = await handle_message(agent, thread_id, BRIEFING_PROMPT, 0)
+    reply, _ = await handle_message(agent, thread_id, build_briefing_prompt(), 0)
 
     await update.message.reply_text(reply)
 
