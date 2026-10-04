@@ -1,4 +1,5 @@
 import logging
+from functools import wraps
 
 from dotenv import load_dotenv
 from telegram import Update
@@ -19,6 +20,8 @@ from utils.require_env import require_env
 load_dotenv()
 
 token = require_env("BOT_TOKEN")
+
+ALLOWED_CHAT_IDS = {int(require_env("TELEGRAM_CHAT_ID"))}
 
 PRIVACY_SYSTEM_PROMPT = (
     "This chat is not end-to-end encrypted. Never write out sensitive personal "
@@ -46,6 +49,17 @@ client = build_mcp_client()
 postgres_mcp_session = client.session("postgres")
 
 
+def restrict_to_allowed_chat(handler):
+    @wraps(handler)
+    async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if not update.effective_chat or update.effective_chat.id not in ALLOWED_CHAT_IDS:
+            return
+
+        await handler(update, context)
+
+    return wrapper
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.effective_chat:
         return
@@ -64,6 +78,7 @@ async def chatid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+@restrict_to_allowed_chat
 async def briefing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.effective_chat:
         return
@@ -76,6 +91,7 @@ async def briefing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(reply)
 
 
+@restrict_to_allowed_chat
 async def handle_telegram_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if (
         not update.message
