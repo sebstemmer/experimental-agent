@@ -42,7 +42,7 @@ def register(job_queue: JobQueue) -> None:
         return
 
     async def send_morning_briefing(context: ContextTypes.DEFAULT_TYPE) -> None:
-        agent = context.application.bot_data["agent"]
+        agent = context.application.bot_data["agents"][int(chat_id)]
         reply, _ = await handle_message(agent, chat_id, build_briefing_prompt(), 0)
         await context.bot.send_message(chat_id=chat_id, text=reply)
 
